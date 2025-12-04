@@ -13385,6 +13385,8 @@ def test_object_lock_put_obj_retention_shorten_period_bypass():
 
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_retention():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13430,6 +13432,8 @@ def test_object_lock_delete_multipart_object_with_retention():
     assert response['ResponseMetadata']['HTTPStatusCode'] == 204
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_retention_and_marker():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13455,6 +13459,8 @@ def test_object_lock_delete_object_with_retention_and_marker():
     assert response['ResponseMetadata']['HTTPStatusCode'] == 204
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_object_lock_multi_delete_object_with_retention():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13592,6 +13598,8 @@ def test_object_lock_get_legal_hold_invalid_bucket():
 
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_legal_hold_on():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13630,6 +13638,8 @@ def test_object_lock_delete_multipart_object_with_legal_hold_on():
     client.put_object_legal_hold(Bucket=bucket_name, Key=key, LegalHold={'Status':'OFF'})
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_legal_hold_off():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -16985,6 +16995,8 @@ def _bucket_logging_delete_objects(versioned):
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_without_logging_rollover
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_bucket_logging_delete_objects():
     _bucket_logging_delete_objects(False)
 
@@ -16992,6 +17004,8 @@ def test_bucket_logging_delete_objects():
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_without_logging_rollover
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_bucket_logging_delete_objects_versioned():
     _bucket_logging_delete_objects(True)
 
@@ -19238,6 +19252,7 @@ def test_put_object_current_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
 def test_delete_object_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19263,6 +19278,8 @@ def test_delete_object_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_object_current_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19298,6 +19315,8 @@ def test_delete_object_current_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_object_version_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19327,6 +19346,7 @@ def test_delete_object_version_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
 def test_delete_object_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19348,6 +19368,8 @@ def test_delete_object_if_match_last_modified_time():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_delete_object_current_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19372,6 +19394,8 @@ def test_delete_object_current_if_match_last_modified_time():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_delete_object_version_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19395,6 +19419,7 @@ def test_delete_object_version_if_match_last_modified_time():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
 def test_delete_object_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19416,6 +19441,8 @@ def test_delete_object_if_match_size():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_supported
 def test_delete_object_current_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19439,6 +19466,8 @@ def test_delete_object_current_if_match_size():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_object_version_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19462,6 +19491,7 @@ def test_delete_object_version_if_match_size():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
 def test_delete_objects_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19482,6 +19512,8 @@ def test_delete_objects_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_objects_current_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19504,6 +19536,8 @@ def test_delete_objects_current_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_objects_version_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19527,6 +19561,7 @@ def test_delete_objects_version_if_match():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
 def test_delete_objects_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19549,6 +19584,8 @@ def test_delete_objects_if_match_last_modified_time():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_objects_current_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19574,6 +19611,8 @@ def test_delete_objects_current_if_match_last_modified_time():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_objects_version_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19600,6 +19639,7 @@ def test_delete_objects_version_if_match_last_modified_time():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
 def test_delete_objects_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19622,6 +19662,8 @@ def test_delete_objects_if_match_size():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_objects_current_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19647,6 +19689,8 @@ def test_delete_objects_current_if_match_size():
 @pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
+@pytest.mark.delete
+@pytest.mark.s3d_not_implemented
 def test_delete_objects_version_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
