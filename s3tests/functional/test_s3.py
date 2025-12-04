@@ -5921,6 +5921,7 @@ def _multipart_upload_checksum(bucket_name, key, size, part_size=5*1024*1024, cl
 
 @pytest.mark.copy
 @pytest.mark.fails_on_dbstore
+@pytest.mark.multipart
 @pytest.mark.s3d_not_implemented
 def test_object_copy_versioning_multipart_upload():
     bucket_name = get_new_bucket()
@@ -9455,6 +9456,7 @@ def test_lifecycle_deletemarker_expiration_with_days_tag():
     assert len(delete_markers) == 0
 
 @pytest.mark.lifecycle
+@pytest.mark.multipart
 @pytest.mark.s3d_not_supported
 def test_lifecycle_set_multipart():
     bucket_name = get_new_bucket()
@@ -12330,6 +12332,7 @@ def test_bucket_policy_put_obj_tagging_existing_tag():
 @pytest.mark.copy
 @pytest.mark.bucket_policy
 @pytest.mark.fails_on_dbstore
+@pytest.mark.multipart
 @pytest.mark.s3d_not_implemented
 def test_bucket_policy_upload_part_copy():
     bucket_name = _create_objects(keys=['public/foo', 'public/bar', 'private/foo'])
@@ -17275,6 +17278,7 @@ def _bucket_logging_mpu(versioned, record_type):
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_without_logging_rollover
+@pytest.mark.multipart
 def test_bucket_logging_mpu_s():
     _bucket_logging_mpu(False, 'Standard')
 
@@ -17282,12 +17286,14 @@ def test_bucket_logging_mpu_s():
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_without_logging_rollover
+@pytest.mark.multipart
 def test_bucket_logging_mpu_versioned_s():
     _bucket_logging_mpu(True, 'Standard')
 
 
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
+@pytest.mark.multipart
 def test_bucket_logging_mpu_j():
     if not _has_bucket_logging_extension():
         pytest.skip('ceph extension to bucket logging not supported at client')
@@ -17296,6 +17302,7 @@ def test_bucket_logging_mpu_j():
 
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
+@pytest.mark.multipart
 def test_bucket_logging_mpu_versioned_j():
     if not _has_bucket_logging_extension():
         pytest.skip('ceph extension to bucket logging not supported at client')
@@ -17350,6 +17357,7 @@ def _bucket_logging_mpu_copy(versioned):
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_without_logging_rollover
+@pytest.mark.multipart
 def test_bucket_logging_mpu_copy():
     _bucket_logging_mpu_copy(False)
 
@@ -17357,6 +17365,7 @@ def test_bucket_logging_mpu_copy():
 @pytest.mark.bucket_logging
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_without_logging_rollover
+@pytest.mark.multipart
 def test_bucket_logging_mpu_copy_versioned():
     _bucket_logging_mpu_copy(True)
 
@@ -18553,6 +18562,7 @@ def check_parts_count(parts, expected):
 
 @pytest.mark.checksum
 @pytest.mark.fails_on_dbstore
+@pytest.mark.multipart
 @pytest.mark.s3d_not_supported
 def test_get_multipart_checksum_object_attributes():
     bucket_name = get_new_bucket()
@@ -18857,8 +18867,8 @@ def test_get_object_attributes():
     assert 'ObjectParts' not in response
 
 
+@pytest.mark.multipart
 def test_upload_part_copy_percent_encoded_key():
-    
     s3_client = get_client()
     bucket_name = get_new_bucket()
     key = "anyfile.txt"
