@@ -413,7 +413,11 @@ def get_cloud_config(cfg):
 
 def get_client(client_config=None):
     if client_config == None:
-        client_config = Config(signature_version='s3v4')
+        client_config = Config(
+            signature_version='s3v4',
+            read_timeout=300,
+            retries={'max_attempts': 0},
+        )
 
     client = boto3.client(service_name='s3',
                         aws_access_key_id=config.main_access_key,
@@ -507,7 +511,11 @@ def get_iam_alt_root_client(**kwargs):
 
 def get_alt_client(client_config=None):
     if client_config == None:
-        client_config = Config(signature_version='s3v4')
+        client_config = Config(
+            signature_version='s3v4',
+            read_timeout=300,
+            retries={'max_attempts': 0},
+        )
 
     client = boto3.client(service_name='s3',
                         aws_access_key_id=config.alt_access_key,
@@ -532,7 +540,11 @@ def get_cloud_client(client_config=None):
 
 def get_tenant_client(client_config=None):
     if client_config == None:
-        client_config = Config(signature_version='s3v4')
+        client_config = Config(
+            signature_version='s3v4',
+            read_timeout=300,
+            retries={'max_attempts': 0},
+        )
 
     client = boto3.client(service_name='s3',
                         aws_access_key_id=config.tenant_access_key,
