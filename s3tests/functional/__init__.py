@@ -99,6 +99,11 @@ def nuke_bucket(client, bucket):
     batch_size = 128
     max_retain_date = None
 
+    # abort any pending multipart uploads
+    uploads = client.list_multipart_uploads(Bucket=bucket)
+    for upload in uploads.get('Uploads', []):
+        client.abort_multipart_upload(Bucket=bucket, Key=upload['Key'], UploadId=upload['UploadId'])
+
     # list and delete objects in batches
     for objects in list_versions(client, bucket, batch_size):
         delete = client.delete_objects(Bucket=bucket,
