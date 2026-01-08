@@ -5624,6 +5624,7 @@ def test_object_copy_diff_bucket():
     assert 'foo' == body
 
 @pytest.mark.copy
+@pytest.mark.s3d_not_implemented
 def test_object_copy_not_owned_bucket():
     client = get_client()
     alt_client = get_alt_client()
