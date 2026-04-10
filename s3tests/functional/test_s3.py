@@ -109,7 +109,7 @@ def test_bucket_list_empty():
     is_empty = _bucket_is_empty(bucket)
     assert is_empty == True
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_list_distinct():
     bucket1 = get_new_bucket_resource()
     bucket2 = get_new_bucket_resource()
@@ -152,6 +152,7 @@ def _get_prefixes(response):
         prefixes = [prefix['Prefix'] for prefix in prefix_list]
     return prefixes
 
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_many():
     bucket_name = _create_objects(keys=['foo', 'bar', 'baz'])
@@ -169,7 +170,7 @@ def test_bucket_list_many():
     assert response['IsTruncated'] == False
     assert keys == ['foo']
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_listv2_many():
     bucket_name = _create_objects(keys=['foo', 'bar', 'baz'])
@@ -187,7 +188,7 @@ def test_bucket_listv2_many():
     assert response['IsTruncated'] == False
     assert keys == ['foo']
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_basic_key_count():
     client = get_client()
     bucket_names = []
@@ -198,6 +199,7 @@ def test_basic_key_count():
     response1 = client.list_objects_v2(Bucket=bucket_name)
     assert response1['KeyCount'] == 5
 
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_basic():
     bucket_name = _create_objects(keys=['foo/bar', 'foo/bar/xyzzy', 'quux/thud', 'asdf'])
     client = get_client()
@@ -211,7 +213,7 @@ def test_bucket_list_delimiter_basic():
     assert len(prefixes) == 2
     assert prefixes == ['foo/', 'quux/']
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_delimiter_basic():
     bucket_name = _create_objects(keys=['foo/bar', 'foo/bar/xyzzy', 'quux/thud', 'asdf'])
     client = get_client()
@@ -227,7 +229,7 @@ def test_bucket_listv2_delimiter_basic():
     assert response['KeyCount'] == len(prefixes) + len(keys)
 
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_encoding_basic():
     bucket_name = _create_objects(keys=['foo+1/bar', 'foo/bar/xyzzy', 'quux ab/thud', 'asdf+b'])
     client = get_client()
@@ -241,6 +243,7 @@ def test_bucket_listv2_encoding_basic():
     assert len(prefixes) == 3
     assert prefixes == ['foo%2B1/', 'foo/', 'quux%20ab/']
 
+@pytest.mark.list_objects
 def test_bucket_list_encoding_basic():
     bucket_name = _create_objects(keys=['foo+1/bar', 'foo/bar/xyzzy', 'quux ab/thud', 'asdf+b'])
     client = get_client()
@@ -302,6 +305,7 @@ def validate_bucket_listv2(bucket_name, prefix, delimiter, continuation_token, m
 
     return response['NextContinuationToken']
 
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_delimiter_prefix():
     bucket_name = _create_objects(keys=['asdf', 'boo/bar', 'boo/baz/xyzzy', 'cquux/thud', 'cquux/bla'])
@@ -324,7 +328,7 @@ def test_bucket_list_delimiter_prefix():
 
     marker = validate_bucket_list(bucket_name, prefix, delim, '', 2, False, ['boo/bar'], ['boo/baz/'], None)
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_listv2_delimiter_prefix():
     bucket_name = _create_objects(keys=['asdf', 'boo/bar', 'boo/baz/xyzzy', 'cquux/thud', 'cquux/bla'])
@@ -348,7 +352,7 @@ def test_bucket_listv2_delimiter_prefix():
     continuation_token = validate_bucket_listv2(bucket_name, prefix, delim, None, 2, False, ['boo/bar'], ['boo/baz/'], last=True)
 
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_delimiter_prefix_ends_with_delimiter():
     bucket_name = _create_objects(keys=['asdf/'])
     validate_bucket_listv2(bucket_name, 'asdf/', '/', None, 1000, False, ['asdf/'], [], last=True)
@@ -357,6 +361,8 @@ def test_bucket_list_delimiter_prefix_ends_with_delimiter():
     bucket_name = _create_objects(keys=['asdf/'])
     validate_bucket_list(bucket_name, 'asdf/', '/', '', 1000, False, ['asdf/'], [], None)
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_alt():
     bucket_name = _create_objects(keys=['bar', 'baz', 'cab', 'foo'])
     client = get_client()
@@ -373,8 +379,8 @@ def test_bucket_list_delimiter_alt():
     assert len(prefixes) == 2
     assert prefixes == ['ba', 'ca']
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_delimiter_alt():
     bucket_name = _create_objects(keys=['bar', 'baz', 'cab', 'foo'])
     client = get_client()
@@ -391,6 +397,7 @@ def test_bucket_listv2_delimiter_alt():
     assert len(prefixes) == 2
     assert prefixes == ['ba', 'ca']
 
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_delimiter_prefix_underscore():
     bucket_name = _create_objects(keys=['_obj1_','_under1/bar', '_under1/baz/xyzzy', '_under2/thud', '_under2/bla'])
@@ -412,7 +419,7 @@ def test_bucket_list_delimiter_prefix_underscore():
 
     marker = validate_bucket_list(bucket_name, prefix, delim, '', 2, False, ['_under1/bar'], ['_under1/baz/'], None)
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_listv2_delimiter_prefix_underscore():
     bucket_name = _create_objects(keys=['_obj1_','_under1/bar', '_under1/baz/xyzzy', '_under2/thud', '_under2/bla'])
@@ -435,6 +442,8 @@ def test_bucket_listv2_delimiter_prefix_underscore():
     continuation_token  = validate_bucket_listv2(bucket_name, prefix, delim, None, 2, False, ['_under1/bar'], ['_under1/baz/'], last=True)
 
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_percentage():
     bucket_name = _create_objects(keys=['b%ar', 'b%az', 'c%ab', 'foo'])
     client = get_client()
@@ -450,8 +459,8 @@ def test_bucket_list_delimiter_percentage():
     # bar, baz, and cab should be broken up by the 'a' delimiters
     assert prefixes == ['b%', 'c%']
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_delimiter_percentage():
     bucket_name = _create_objects(keys=['b%ar', 'b%az', 'c%ab', 'foo'])
     client = get_client()
@@ -467,6 +476,8 @@ def test_bucket_listv2_delimiter_percentage():
     # bar, baz, and cab should be broken up by the 'a' delimiters
     assert prefixes == ['b%', 'c%']
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_whitespace():
     bucket_name = _create_objects(keys=['b ar', 'b az', 'c ab', 'foo'])
     client = get_client()
@@ -482,8 +493,8 @@ def test_bucket_list_delimiter_whitespace():
     # bar, baz, and cab should be broken up by the 'a' delimiters
     assert prefixes == ['b ', 'c ']
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_delimiter_whitespace():
     bucket_name = _create_objects(keys=['b ar', 'b az', 'c ab', 'foo'])
     client = get_client()
@@ -499,6 +510,8 @@ def test_bucket_listv2_delimiter_whitespace():
     # bar, baz, and cab should be broken up by the 'a' delimiters
     assert prefixes == ['b ', 'c ']
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_dot():
     bucket_name = _create_objects(keys=['b.ar', 'b.az', 'c.ab', 'foo'])
     client = get_client()
@@ -514,8 +527,8 @@ def test_bucket_list_delimiter_dot():
     # bar, baz, and cab should be broken up by the 'a' delimiters
     assert prefixes == ['b.', 'c.']
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_delimiter_dot():
     bucket_name = _create_objects(keys=['b.ar', 'b.az', 'c.ab', 'foo'])
     client = get_client()
@@ -531,6 +544,8 @@ def test_bucket_listv2_delimiter_dot():
     # bar, baz, and cab should be broken up by the 'a' delimiters
     assert prefixes == ['b.', 'c.']
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_unreadable():
     key_names=['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -544,8 +559,8 @@ def test_bucket_list_delimiter_unreadable():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_delimiter_unreadable():
     key_names=['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -559,6 +574,8 @@ def test_bucket_listv2_delimiter_unreadable():
     assert keys == key_names
     assert prefixes == []
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_empty():
     key_names = ['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -573,7 +590,8 @@ def test_bucket_list_delimiter_empty():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_listv2_delimiter_empty():
     key_names = ['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -588,6 +606,7 @@ def test_bucket_listv2_delimiter_empty():
     assert keys == key_names
     assert prefixes == []
 
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_none():
     key_names = ['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -602,7 +621,7 @@ def test_bucket_list_delimiter_none():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_delimiter_none():
     key_names = ['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -617,7 +636,7 @@ def test_bucket_listv2_delimiter_none():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_fetchowner_notempty():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -627,7 +646,7 @@ def test_bucket_listv2_fetchowner_notempty():
     objs_list = response['Contents']
     assert 'Owner' in objs_list[0]
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_fetchowner_defaultempty():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -637,7 +656,7 @@ def test_bucket_listv2_fetchowner_defaultempty():
     objs_list = response['Contents']
     assert not 'Owner' in objs_list[0]
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_fetchowner_empty():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -647,6 +666,7 @@ def test_bucket_listv2_fetchowner_empty():
     objs_list = response['Contents']
     assert not 'Owner' in objs_list[0]
 
+@pytest.mark.list_objects
 def test_bucket_list_delimiter_not_exist():
     key_names = ['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -661,7 +681,7 @@ def test_bucket_list_delimiter_not_exist():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_delimiter_not_exist():
     key_names = ['bar', 'baz', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -677,6 +697,7 @@ def test_bucket_listv2_delimiter_not_exist():
     assert prefixes == []
 
 
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_delimiter_not_skip_special():
     key_names = ['0/'] + ['0/%s' % i for i in range(1000, 1999)]
@@ -693,6 +714,7 @@ def test_bucket_list_delimiter_not_skip_special():
     assert keys == key_names2
     assert prefixes == ['0/']
 
+@pytest.mark.list_objects
 def test_bucket_list_prefix_basic():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -706,7 +728,7 @@ def test_bucket_list_prefix_basic():
     assert keys == ['foo/bar', 'foo/baz']
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_basic():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -721,6 +743,7 @@ def test_bucket_listv2_prefix_basic():
     assert prefixes == []
 
 # just testing that we can do the delimeter and prefix logic on non-slashes
+@pytest.mark.list_objects
 def test_bucket_list_prefix_alt():
     key_names = ['bar', 'baz', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -734,7 +757,7 @@ def test_bucket_list_prefix_alt():
     assert keys == ['bar', 'baz']
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_alt():
     key_names = ['bar', 'baz', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -748,6 +771,7 @@ def test_bucket_listv2_prefix_alt():
     assert keys == ['bar', 'baz']
     assert prefixes == []
 
+@pytest.mark.list_objects
 def test_bucket_list_prefix_empty():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -761,7 +785,7 @@ def test_bucket_list_prefix_empty():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_empty():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -775,6 +799,7 @@ def test_bucket_listv2_prefix_empty():
     assert keys == key_names
     assert prefixes == []
 
+@pytest.mark.list_objects
 def test_bucket_list_prefix_none():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -788,7 +813,7 @@ def test_bucket_list_prefix_none():
     assert keys == key_names
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_none():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -802,6 +827,7 @@ def test_bucket_listv2_prefix_none():
     assert keys == key_names
     assert prefixes == []
 
+@pytest.mark.list_objects
 def test_bucket_list_prefix_not_exist():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -815,7 +841,7 @@ def test_bucket_list_prefix_not_exist():
     assert keys == []
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_not_exist():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -829,6 +855,7 @@ def test_bucket_listv2_prefix_not_exist():
     assert keys == []
     assert prefixes == []
 
+@pytest.mark.list_objects
 def test_bucket_list_prefix_unreadable():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -842,7 +869,7 @@ def test_bucket_list_prefix_unreadable():
     assert keys == []
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_unreadable():
     key_names = ['foo/bar', 'foo/baz', 'quux']
     bucket_name = _create_objects(keys=key_names)
@@ -856,6 +883,7 @@ def test_bucket_listv2_prefix_unreadable():
     assert keys == []
     assert prefixes == []
 
+@pytest.mark.list_objects
 def test_bucket_list_prefix_delimiter_basic():
     key_names = ['foo/bar', 'foo/baz/xyzzy', 'quux/thud', 'asdf']
     bucket_name = _create_objects(keys=key_names)
@@ -870,7 +898,7 @@ def test_bucket_list_prefix_delimiter_basic():
     assert keys == ['foo/bar']
     assert prefixes == ['foo/baz/']
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_prefix_delimiter_basic():
     key_names = ['foo/bar', 'foo/baz/xyzzy', 'quux/thud', 'asdf']
     bucket_name = _create_objects(keys=key_names)
@@ -885,6 +913,8 @@ def test_bucket_listv2_prefix_delimiter_basic():
     assert keys == ['foo/bar']
     assert prefixes == ['foo/baz/']
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_prefix_delimiter_alt():
     key_names = ['bar', 'bazar', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -899,8 +929,8 @@ def test_bucket_list_prefix_delimiter_alt():
     assert keys == ['bar']
     assert prefixes == ['baza']
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_prefix_delimiter_alt():
     key_names = ['bar', 'bazar', 'cab', 'foo']
     bucket_name = _create_objects(keys=key_names)
@@ -915,6 +945,8 @@ def test_bucket_listv2_prefix_delimiter_alt():
     assert keys == ['bar']
     assert prefixes == ['baza']
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_prefix_delimiter_prefix_not_exist():
     key_names = ['b/a/r', 'b/a/c', 'b/a/g', 'g']
     bucket_name = _create_objects(keys=key_names)
@@ -927,8 +959,8 @@ def test_bucket_list_prefix_delimiter_prefix_not_exist():
     assert keys == []
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_prefix_delimiter_prefix_not_exist():
     key_names = ['b/a/r', 'b/a/c', 'b/a/g', 'g']
     bucket_name = _create_objects(keys=key_names)
@@ -941,6 +973,8 @@ def test_bucket_listv2_prefix_delimiter_prefix_not_exist():
     assert keys == []
     assert prefixes == []
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_prefix_delimiter_delimiter_not_exist():
     key_names = ['b/a/c', 'b/a/g', 'b/a/r', 'g']
     bucket_name = _create_objects(keys=key_names)
@@ -953,8 +987,8 @@ def test_bucket_list_prefix_delimiter_delimiter_not_exist():
     assert keys == ['b/a/c', 'b/a/g', 'b/a/r']
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_prefix_delimiter_delimiter_not_exist():
     key_names = ['b/a/c', 'b/a/g', 'b/a/r', 'g']
     bucket_name = _create_objects(keys=key_names)
@@ -967,6 +1001,8 @@ def test_bucket_listv2_prefix_delimiter_delimiter_not_exist():
     assert keys == ['b/a/c', 'b/a/g', 'b/a/r']
     assert prefixes == []
 
+@pytest.mark.s3d_not_delimiter_alt
+@pytest.mark.list_objects
 def test_bucket_list_prefix_delimiter_prefix_delimiter_not_exist():
     key_names = ['b/a/c', 'b/a/g', 'b/a/r', 'g']
     bucket_name = _create_objects(keys=key_names)
@@ -979,8 +1015,8 @@ def test_bucket_list_prefix_delimiter_prefix_delimiter_not_exist():
     assert keys == []
     assert prefixes == []
 
-@pytest.mark.list_objects_v2
-@pytest.mark.s3d_not_supported
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_delimiter_alt
 def test_bucket_listv2_prefix_delimiter_prefix_delimiter_not_exist():
     key_names = ['b/a/c', 'b/a/g', 'b/a/r', 'g']
     bucket_name = _create_objects(keys=key_names)
@@ -993,6 +1029,7 @@ def test_bucket_listv2_prefix_delimiter_prefix_delimiter_not_exist():
     assert keys == []
     assert prefixes == []
 
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_maxkeys_one():
     key_names = ['bar', 'baz', 'foo', 'quxx']
@@ -1011,7 +1048,7 @@ def test_bucket_list_maxkeys_one():
     keys = _get_keys(response)
     assert keys == key_names[1:]
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_listv2_maxkeys_one():
     key_names = ['bar', 'baz', 'foo', 'quxx']
@@ -1030,6 +1067,7 @@ def test_bucket_listv2_maxkeys_one():
     keys = _get_keys(response)
     assert keys == key_names[1:]
 
+@pytest.mark.list_objects
 def test_bucket_list_maxkeys_zero():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1041,7 +1079,7 @@ def test_bucket_list_maxkeys_zero():
     keys = _get_keys(response)
     assert keys == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_maxkeys_zero():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1053,6 +1091,7 @@ def test_bucket_listv2_maxkeys_zero():
     keys = _get_keys(response)
     assert keys == []
 
+@pytest.mark.list_objects
 def test_bucket_list_maxkeys_none():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1064,7 +1103,7 @@ def test_bucket_list_maxkeys_none():
     assert keys == key_names
     assert response['MaxKeys'] == 1000
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_maxkeys_none():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1130,6 +1169,8 @@ def test_head_bucket_usage():
     assert hdrs['X-RGW-Bytes-Used'] == '3'
     assert hdrs['X-RGW-Quota-Max-Buckets'] == '1000'
 
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_supported
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_unordered():
@@ -1184,7 +1225,8 @@ def test_bucket_list_unordered():
     assert error_code == 'InvalidArgument'
 
 @pytest.mark.fails_on_aws
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_supported
 @pytest.mark.fails_on_dbstore
 def test_bucket_listv2_unordered():
     # boto3.set_stream_logger(name='botocore')
@@ -1257,6 +1299,7 @@ def test_bucket_list_maxkeys_invalid():
 
 
 
+@pytest.mark.list_objects
 def test_bucket_list_marker_none():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1266,6 +1309,7 @@ def test_bucket_list_marker_none():
     assert response['Marker'] == ''
 
 
+@pytest.mark.list_objects
 def test_bucket_list_marker_empty():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1277,7 +1321,7 @@ def test_bucket_list_marker_empty():
     keys = _get_keys(response)
     assert keys == key_names
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_continuationtoken_empty():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1289,7 +1333,7 @@ def test_bucket_listv2_continuationtoken_empty():
     keys = _get_keys(response)
     assert keys == key_names
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_continuationtoken():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1305,7 +1349,7 @@ def test_bucket_listv2_continuationtoken():
     keys = _get_keys(response2)
     assert keys == key_names2
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 def test_bucket_listv2_both_continuationtoken_startafter():
     key_names = ['bar', 'baz', 'foo', 'quxx']
@@ -1323,6 +1367,7 @@ def test_bucket_listv2_both_continuationtoken_startafter():
     keys = _get_keys(response2)
     assert keys == key_names2
 
+@pytest.mark.list_objects
 def test_bucket_list_marker_unreadable():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1334,7 +1379,7 @@ def test_bucket_list_marker_unreadable():
     keys = _get_keys(response)
     assert keys == key_names
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_startafter_unreadable():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1346,6 +1391,7 @@ def test_bucket_listv2_startafter_unreadable():
     keys = _get_keys(response)
     assert keys == key_names
 
+@pytest.mark.list_objects
 def test_bucket_list_marker_not_in_list():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1356,7 +1402,7 @@ def test_bucket_list_marker_not_in_list():
     keys = _get_keys(response)
     assert keys == [ 'foo','quxx']
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_startafter_not_in_list():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1367,6 +1413,7 @@ def test_bucket_listv2_startafter_not_in_list():
     keys = _get_keys(response)
     assert keys == ['foo', 'quxx']
 
+@pytest.mark.list_objects
 def test_bucket_list_marker_after_list():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1378,7 +1425,7 @@ def test_bucket_list_marker_after_list():
     assert response['IsTruncated'] == False
     assert keys == []
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_startafter_after_list():
     key_names = ['bar', 'baz', 'foo', 'quxx']
     bucket_name = _create_objects(keys=key_names)
@@ -1399,6 +1446,8 @@ def _compare_dates(datetime1, datetime2):
     datetime1 = datetime1.replace(microsecond=0)
     assert datetime1 == datetime2
 
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_supported
 @pytest.mark.fails_on_dbstore
 def test_bucket_list_return_data():
     key_names = ['bar', 'baz', 'foo']
@@ -1468,6 +1517,8 @@ def test_bucket_list_return_data_versioning():
         assert obj['VersionId'] == key_data['VersionId']
         _compare_dates(obj['LastModified'],key_data['LastModified'])
 
+@pytest.mark.list_objects
+@pytest.mark.s3d_not_supported
 def test_bucket_list_objects_anonymous():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -1477,7 +1528,7 @@ def test_bucket_list_objects_anonymous():
     unauthenticated_client.list_objects(Bucket=bucket_name)
 
 @pytest.mark.s3d_not_implemented
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_objects_anonymous():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -1496,7 +1547,7 @@ def test_bucket_list_objects_anonymous_fail():
     assert status == 403
     assert error_code == 'AccessDenied'
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucket_listv2_objects_anonymous_fail():
     bucket_name = get_new_bucket()
 
@@ -1517,7 +1568,7 @@ def test_bucket_notexist():
     assert status == 404
     assert error_code == 'NoSuchBucket'
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucketv2_notexist():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -1720,7 +1771,7 @@ def test_multi_object_delete():
     assert 'Contents' not in response
 
 @pytest.mark.s3d_not_implemented
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_expected_bucket_owner():
   bucket_name = get_new_bucket()
   client = get_client()
@@ -1741,7 +1792,7 @@ def test_expected_bucket_owner():
   assert status == 403
   assert error_code == 'AccessDenied'
 
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_multi_objectv2_delete():
     key_names = ['key0', 'key1', 'key2']
     bucket_name = _create_objects(keys=key_names)
@@ -5117,7 +5168,7 @@ def test_access_bucket_private_object_private():
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
 @pytest.mark.s3d_not_implemented
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_access_bucket_private_objectv2_private():
     # all the test_access_* tests follow this template
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='private', object_acl='private')
@@ -5166,7 +5217,7 @@ def test_access_bucket_private_object_publicread():
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
 @pytest.mark.s3d_not_implemented
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_access_bucket_private_objectv2_publicread():
 
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='private', object_acl='public-read')
@@ -5208,7 +5259,7 @@ def test_access_bucket_private_object_publicreadwrite():
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
 @pytest.mark.s3d_not_implemented
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_access_bucket_private_objectv2_publicreadwrite():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='private', object_acl='public-read-write')
     alt_client = get_alt_client()
@@ -8590,7 +8641,7 @@ def test_lifecycle_expiration():
 @pytest.mark.lifecycle
 @pytest.mark.lifecycle_expiration
 @pytest.mark.fails_on_aws
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.fails_on_dbstore
 @pytest.mark.s3d_not_implemented
 def test_lifecyclev2_expiration():
@@ -11222,7 +11273,7 @@ def test_bucket_policy():
     assert len(response['Contents']) == 1
 
 @pytest.mark.bucket_policy
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.s3d_not_implemented
 def test_bucketv2_policy():
     bucket_name = get_new_bucket()
@@ -11370,7 +11421,7 @@ def test_bucket_policy_acl():
 
 @pytest.mark.s3d_not_implemented
 @pytest.mark.bucket_policy
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 def test_bucketv2_policy_acl():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11545,7 +11596,7 @@ def test_bucket_policy_another_bucket():
     assert len(response['Contents']) == 1
 
 @pytest.mark.bucket_policy
-@pytest.mark.list_objects_v2
+@pytest.mark.list_objects
 @pytest.mark.s3d_not_implemented
 def test_bucketv2_policy_another_bucket():
     bucket_name = get_new_bucket()
