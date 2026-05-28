@@ -1134,6 +1134,7 @@ def parseXmlToJson(xml):
   return response
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_account_usage():
     # boto3.set_stream_logger(name='botocore')
     client = get_client()
@@ -1154,6 +1155,7 @@ def test_account_usage():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_head_bucket_usage():
     client = get_client()
     bucket_name = _create_objects(keys=['foo'])
@@ -1649,6 +1651,7 @@ def test_object_write_to_nonexist_bucket():
 def _ev_add_te_header(request, **kwargs):
     request.headers.add_header('Transfer-Encoding', 'chunked')
 
+@pytest.mark.s3d_not_supported
 def test_object_write_with_chunked_transfer_encoding():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -1687,6 +1690,7 @@ def get_http_response(**kwargs):
     http_response = kwargs['http_response'].__dict__
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_object_requestid_matches_header_on_error():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -1943,6 +1947,7 @@ def test_object_set_get_metadata_overwrite_to_empty():
 
 # TODO: the decoding of this unicode metadata is not happening properly for unknown reasons
 @pytest.mark.fails_on_rgw
+@pytest.mark.s3d_not_supported
 def test_object_set_get_unicode_metadata():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3172,6 +3177,7 @@ def test_get_object_ifunmodifiedsince_failed():
 
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3193,6 +3199,7 @@ def test_put_object_ifmatch_good():
     assert body == 'zar'
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3215,6 +3222,7 @@ def test_put_object_ifmatch_failed():
     assert body == 'bar'
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_overwrite_existed_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3233,6 +3241,7 @@ def test_put_object_ifmatch_overwrite_existed_good():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_nonexisted_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3250,6 +3259,7 @@ def test_put_object_ifmatch_nonexisted_failed():
     assert error_code == 'NoSuchKey'
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3268,6 +3278,7 @@ def test_put_object_ifnonmatch_good():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3292,6 +3303,7 @@ def test_put_object_ifnonmatch_failed():
     assert body == 'bar'
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_nonexisted_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3306,6 +3318,7 @@ def test_put_object_ifnonmatch_nonexisted_good():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_overwrite_existed_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3350,6 +3363,7 @@ def _setup_bucket_acl(bucket_acl=None):
 
     return bucket_name
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
 
@@ -3357,6 +3371,7 @@ def test_object_raw_get():
     response = unauthenticated_client.get_object(Bucket=bucket_name, Key='foo')
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_bucket_gone():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3371,6 +3386,7 @@ def test_object_raw_get_bucket_gone():
     assert status == 404
     assert error_code == 'NoSuchBucket'
 
+@pytest.mark.s3d_not_supported
 def test_object_delete_key_bucket_gone():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3385,6 +3401,7 @@ def test_object_delete_key_bucket_gone():
     assert status == 404
     assert error_code == 'NoSuchBucket'
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_object_gone():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3420,6 +3437,7 @@ def test_bucket_head_notexist():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_bucket_head_extended():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3491,6 +3509,7 @@ def test_object_put_acl_mtime():
     obj_list = response['Versions'][0]
     _compare_dates(obj_list['LastModified'],create_mtime)
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_authenticated():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
 
@@ -3498,6 +3517,7 @@ def test_object_raw_authenticated():
     response = client.get_object(Bucket=bucket_name, Key='foo')
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_response_headers():
     bucket_name = _setup_bucket_object_acl('private', 'private')
 
@@ -3511,6 +3531,7 @@ def test_object_raw_response_headers():
     assert response['ResponseMetadata']['HTTPHeaders']['content-encoding'] == 'aaa'
     assert response['ResponseMetadata']['HTTPHeaders']['cache-control'] == 'no-cache'
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_authenticated_bucket_acl():
     bucket_name = _setup_bucket_object_acl('private', 'public-read')
 
@@ -3518,6 +3539,7 @@ def test_object_raw_authenticated_bucket_acl():
     response = client.get_object(Bucket=bucket_name, Key='foo')
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_authenticated_object_acl():
     bucket_name = _setup_bucket_object_acl('public-read', 'private')
 
@@ -3525,6 +3547,7 @@ def test_object_raw_authenticated_object_acl():
     response = client.get_object(Bucket=bucket_name, Key='foo')
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_authenticated_bucket_gone():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3537,6 +3560,7 @@ def test_object_raw_authenticated_bucket_gone():
     assert status == 404
     assert error_code == 'NoSuchBucket'
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_authenticated_object_gone():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3560,12 +3584,15 @@ def _test_object_raw_get_x_amz_expires_not_expired(client):
     res = requests.get(url, verify=get_config_ssl_verify()).__dict__
     assert res['status_code'] == 200
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_x_amz_expires_not_expired():
     _test_object_raw_get_x_amz_expires_not_expired(client=get_client())
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_x_amz_expires_not_expired_tenant():
     _test_object_raw_get_x_amz_expires_not_expired(client=get_tenant_client())
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_x_amz_expires_out_range_zero():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3576,6 +3603,7 @@ def test_object_raw_get_x_amz_expires_out_range_zero():
     res = requests.get(url, verify=get_config_ssl_verify()).__dict__
     assert res['status_code'] == 403
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_x_amz_expires_out_max_range():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3586,6 +3614,7 @@ def test_object_raw_get_x_amz_expires_out_max_range():
     res = requests.get(url, verify=get_config_ssl_verify()).__dict__
     assert res['status_code'] == 403
 
+@pytest.mark.s3d_not_supported
 def test_object_raw_get_x_amz_expires_out_positive_range():
     bucket_name = _setup_bucket_object_acl('public-read', 'public-read')
     client = get_client()
@@ -3625,6 +3654,7 @@ def test_object_content_encoding_aws_chunked():
     response = client.head_object(Bucket=bucket, Key=key)
     assert 'ContentEncoding' not in response
 
+@pytest.mark.s3d_not_supported
 def test_object_anon_put():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3638,6 +3668,7 @@ def test_object_anon_put():
     assert status == 403
     assert error_code == 'AccessDenied'
 
+@pytest.mark.s3d_not_supported
 def test_object_anon_put_write_access():
     bucket_name = _setup_bucket_acl('public-read-write')
     client = get_client()
@@ -3905,6 +3936,7 @@ def test_bucket_create_exists():
         assert e.error_code == 'BucketAlreadyOwnedByYou'
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_bucket_get_location():
     location_constraint = get_main_api_name()
     if not location_constraint:
@@ -3920,6 +3952,7 @@ def test_bucket_get_location():
     assert response['LocationConstraint'] == location_constraint
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_bucket_create_exists_nonowner():
     # Names are shared across a global namespace. As such, no two
     # users can create a bucket with that same name.
@@ -5140,6 +5173,7 @@ def list_bucket_versions(client, bucket_name):
 
     return result
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_private_object_private():
     # all the test_access_* tests follow this template
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='private', object_acl='private')
@@ -5196,6 +5230,7 @@ def test_access_bucket_private_objectv2_private():
     alt_client3 = get_alt_client()
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_private_object_publicread():
 
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='private', object_acl='public-read')
@@ -5238,6 +5273,7 @@ def test_access_bucket_private_objectv2_publicread():
     check_access_denied(alt_client3.list_objects_v2, Bucket=bucket_name)
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_private_object_publicreadwrite():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='private', object_acl='public-read-write')
     alt_client = get_alt_client()
@@ -5280,6 +5316,7 @@ def test_access_bucket_private_objectv2_publicreadwrite():
     check_access_denied(alt_client3.list_objects_v2, Bucket=bucket_name)
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_publicread_object_private():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='public-read', object_acl='private')
     alt_client = get_alt_client()
@@ -5299,6 +5336,7 @@ def test_access_bucket_publicread_object_private():
     assert objs == ['bar', 'foo']
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_publicread_object_publicread():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='public-read', object_acl='public-read')
     alt_client = get_alt_client()
@@ -5323,6 +5361,7 @@ def test_access_bucket_publicread_object_publicread():
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_publicread_object_publicreadwrite():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='public-read', object_acl='public-read-write')
     alt_client = get_alt_client()
@@ -5349,6 +5388,7 @@ def test_access_bucket_publicread_object_publicreadwrite():
     check_access_denied(alt_client3.put_object, Bucket=bucket_name, Key=newkey, Body='newcontent')
 
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_publicreadwrite_object_private():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='public-read-write', object_acl='private')
     alt_client = get_alt_client()
@@ -5364,6 +5404,7 @@ def test_access_bucket_publicreadwrite_object_private():
     assert objs == ['bar', 'foo']
     alt_client.put_object(Bucket=bucket_name, Key=newkey, Body='newcontent')
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_publicreadwrite_object_publicread():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='public-read-write', object_acl='public-read')
     alt_client = get_alt_client()
@@ -5382,6 +5423,7 @@ def test_access_bucket_publicreadwrite_object_publicread():
     assert objs == ['bar', 'foo']
     alt_client.put_object(Bucket=bucket_name, Key=newkey, Body='newcontent')
 
+@pytest.mark.s3d_not_supported
 def test_access_bucket_publicreadwrite_object_publicreadwrite():
     bucket_name, key1, key2, newkey = _setup_access(bucket_acl='public-read-write', object_acl='public-read-write')
     alt_client = get_alt_client()
@@ -5435,6 +5477,7 @@ def test_buckets_list_ctime():
             assert before <= ctime, '%r > %r' % (before, ctime)
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_list_buckets_anonymous():
     # Get a connection with bad authorization, then change it to be our new Anonymous auth mechanism,
     # emulating standard HTTP access.
@@ -5459,6 +5502,7 @@ def test_list_buckets_bad_auth():
     assert status == 403
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_list_buckets_paginated():
     client = get_client()
 
@@ -5527,6 +5571,7 @@ def test_bucket_recreate_not_overriding():
     assert key_names == objs_list
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_bucket_create_special_key_names():
     key_names = [
         ' ',
@@ -6921,6 +6966,7 @@ def _simple_http_req_100_cont(host, port, is_secure, method, resource):
 
     return l[1]
 
+@pytest.mark.s3d_not_supported
 def test_100_continue():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -7483,6 +7529,7 @@ def _test_atomic_conditional_write(file_size):
     _verify_atomic_key_data(bucket_name, objname, file_size, 'B')
 
 @pytest.mark.fails_on_aws
+@pytest.mark.s3d_not_supported
 def test_atomic_conditional_write_1mb():
     _test_atomic_conditional_write(1024*1024)
 
@@ -7522,6 +7569,7 @@ def _test_atomic_dual_conditional_write(file_size):
 @pytest.mark.fails_on_aws
 # TODO: test not passing with SSL, fix this
 @pytest.mark.fails_on_rgw
+@pytest.mark.s3d_not_supported
 def test_atomic_dual_conditional_write_1mb():
     _test_atomic_dual_conditional_write(1024*1024)
 
@@ -8468,6 +8516,7 @@ def _do_clear_versioned_bucket_concurrent(client, bucket_name):
         t.append(thr)
     return t
 
+@pytest.mark.s3d_not_supported
 def test_versioned_concurrent_object_create_concurrent_remove():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -8492,6 +8541,7 @@ def test_versioned_concurrent_object_create_concurrent_remove():
         response = client.list_object_versions(Bucket=bucket_name)
         assert not 'Versions' in response
 
+@pytest.mark.s3d_not_supported
 def test_versioned_concurrent_object_create_and_remove():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13839,6 +13889,7 @@ def test_copy_object_ifnonematch_failed():
 
 # TODO: results in a 404 instead of 400 on the RGW
 @pytest.mark.fails_on_rgw
+@pytest.mark.s3d_not_supported
 def test_object_read_unreadable():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13847,6 +13898,7 @@ def test_object_read_unreadable():
     assert status == 400
     assert e.response['Error']['Message'] == 'Couldn\'t parse the specified URI.'
 
+@pytest.mark.s3d_not_supported
 def test_get_bucket_policy_status():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13928,6 +13980,7 @@ def test_get_nonpublicpolicy_acl_bucket_policy_status():
     assert resp['PolicyStatus']['IsPublic'] == False
 
 
+@pytest.mark.s3d_not_supported
 def test_get_nonpublicpolicy_principal_bucket_policy_status():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13953,6 +14006,7 @@ def test_get_nonpublicpolicy_principal_bucket_policy_status():
     assert resp['PolicyStatus']['IsPublic'] == False
 
 
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_allow_notprincipal():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13980,6 +14034,7 @@ def test_bucket_policy_allow_notprincipal():
     assert error_code == 'InvalidArgument' or error_code == 'MalformedPolicy'
 
 
+@pytest.mark.s3d_not_supported
 def test_get_undefined_public_block():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13997,6 +14052,7 @@ def test_get_undefined_public_block():
 
     assert response_code == 'NoSuchPublicAccessBlockConfiguration'
 
+@pytest.mark.s3d_not_supported
 def test_get_public_block_deny_bucket_policy():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14025,6 +14081,7 @@ def test_get_public_block_deny_bucket_policy():
     status, error_code = _get_status_and_error_code(e.response)
     assert status == 403
 
+@pytest.mark.s3d_not_supported
 def test_put_public_block():
     #client = get_svc_client(svc='s3control', client_config=Config(s3={'addressing_style': 'path'}))
     bucket_name = get_new_bucket()
@@ -14101,6 +14158,7 @@ def test_block_public_object_canned_acls():
     client.put_object(Bucket=bucket_name, Key='foo4', Body='', ACL='private')
 
 
+@pytest.mark.s3d_not_supported
 def test_block_public_policy():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14118,6 +14176,7 @@ def test_block_public_policy():
     check_access_denied(client.put_bucket_policy, Bucket=bucket_name, Policy=policy_document)
 
 
+@pytest.mark.s3d_not_supported
 def test_block_public_policy_with_principal():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14136,6 +14195,7 @@ def test_block_public_policy_with_principal():
 
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_block_public_restrict_public_buckets():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14202,6 +14262,7 @@ def test_ignore_public_acls():
     check_access_denied(alt_client.list_objects, Bucket=bucket_name)
     check_access_denied(alt_client.get_object, Bucket=bucket_name, Key='key1')
 
+@pytest.mark.s3d_not_supported
 def test_put_get_delete_public_block():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -18808,6 +18869,7 @@ def test_get_single_multipart_object_attributes():
     assert obj_part['Size'] == part_size
     assert 'ChecksumSHA256' not in obj_part
 
+@pytest.mark.s3d_not_supported
 def test_get_checksum_object_attributes():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -18831,6 +18893,7 @@ def test_get_checksum_object_attributes():
     assert response['Checksum']['ChecksumSHA256'] == sha256sum
     assert 'ObjectParts' not in response
 
+@pytest.mark.s3d_not_supported
 def test_get_versioned_object_attributes():
     bucket_name = get_new_bucket()
     check_configure_versioning_retry(bucket_name, "Enabled", "Enabled")
@@ -18910,6 +18973,7 @@ def test_get_sse_c_encrypted_object_attributes():
     assert 'ObjectParts' not in response
 
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_get_object_attributes():
     bucket_name = get_new_bucket()
     client = get_client()
