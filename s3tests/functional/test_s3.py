@@ -5846,7 +5846,6 @@ def test_object_copy_key_not_found():
 
 @pytest.mark.copy
 @pytest.mark.fails_on_dbstore
-@pytest.mark.s3d_not_implemented
 def test_object_copy_versioned_bucket():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -5912,7 +5911,6 @@ def test_object_copy_versioned_bucket():
 
 @pytest.mark.copy
 @pytest.mark.fails_on_dbstore
-@pytest.mark.s3d_not_implemented
 def test_object_copy_versioned_url_encoding():
     bucket = get_new_bucket_resource()
     check_configure_versioning_retry(bucket.name, "Enabled", "Enabled")
@@ -6383,7 +6381,6 @@ def check_configure_versioning_retry(bucket_name, status, expected_string):
 @pytest.mark.copy
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
-@pytest.mark.s3d_not_implemented
 def test_multipart_copy_versioned():
     src_bucket_name = get_new_bucket()
     dest_bucket_name = get_new_bucket()
