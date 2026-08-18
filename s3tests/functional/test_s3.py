@@ -3177,7 +3177,6 @@ def test_get_object_ifunmodifiedsince_failed():
 
 
 @pytest.mark.fails_on_aws
-@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3199,7 +3198,6 @@ def test_put_object_ifmatch_good():
     assert body == 'zar'
 
 @pytest.mark.fails_on_dbstore
-@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3222,7 +3220,6 @@ def test_put_object_ifmatch_failed():
     assert body == 'bar'
 
 @pytest.mark.fails_on_aws
-@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_overwrite_existed_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3241,7 +3238,6 @@ def test_put_object_ifmatch_overwrite_existed_good():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
-@pytest.mark.s3d_not_supported
 def test_put_object_ifmatch_nonexisted_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3259,7 +3255,6 @@ def test_put_object_ifmatch_nonexisted_failed():
     assert error_code == 'NoSuchKey'
 
 @pytest.mark.fails_on_aws
-@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3278,7 +3273,6 @@ def test_put_object_ifnonmatch_good():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
-@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3303,7 +3297,6 @@ def test_put_object_ifnonmatch_failed():
     assert body == 'bar'
 
 @pytest.mark.fails_on_aws
-@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_nonexisted_good():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -3318,7 +3311,6 @@ def test_put_object_ifnonmatch_nonexisted_good():
 
 @pytest.mark.fails_on_aws
 @pytest.mark.fails_on_dbstore
-@pytest.mark.s3d_not_supported
 def test_put_object_ifnonmatch_overwrite_existed_failed():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -7526,7 +7518,6 @@ def _test_atomic_conditional_write(file_size):
     _verify_atomic_key_data(bucket_name, objname, file_size, 'B')
 
 @pytest.mark.fails_on_aws
-@pytest.mark.s3d_not_supported
 def test_atomic_conditional_write_1mb():
     _test_atomic_conditional_write(1024*1024)
 
@@ -7566,7 +7557,6 @@ def _test_atomic_dual_conditional_write(file_size):
 @pytest.mark.fails_on_aws
 # TODO: test not passing with SSL, fix this
 @pytest.mark.fails_on_rgw
-@pytest.mark.s3d_not_supported
 def test_atomic_dual_conditional_write_1mb():
     _test_atomic_dual_conditional_write(1024*1024)
 
@@ -19183,7 +19173,6 @@ def failing_conditional_multipart_upload(expected_failure, client, bucket, key, 
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
-@pytest.mark.s3d_not_implemented
 def test_multipart_put_object_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19249,7 +19238,6 @@ def test_put_current_object_if_none_match():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
-@pytest.mark.s3d_not_implemented
 def test_multipart_put_current_object_if_none_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19309,7 +19297,6 @@ def test_put_current_object_if_match():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
-@pytest.mark.s3d_not_implemented
 def test_multipart_put_current_object_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19392,7 +19379,6 @@ def test_delete_object_if_match():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_object_current_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19429,7 +19415,6 @@ def test_delete_object_current_if_match():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_object_version_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19482,7 +19467,6 @@ def test_delete_object_if_match_last_modified_time():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_delete_object_current_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19508,7 +19492,6 @@ def test_delete_object_current_if_match_last_modified_time():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_delete_object_version_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19555,7 +19538,6 @@ def test_delete_object_if_match_size():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_delete_object_current_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19580,7 +19562,6 @@ def test_delete_object_current_if_match_size():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_object_version_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19626,7 +19607,6 @@ def test_delete_objects_if_match():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_objects_current_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19650,7 +19630,6 @@ def test_delete_objects_current_if_match():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_objects_version_if_match():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19698,7 +19677,6 @@ def test_delete_objects_if_match_last_modified_time():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_objects_current_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19725,7 +19703,6 @@ def test_delete_objects_current_if_match_last_modified_time():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_objects_version_if_match_last_modified_time():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19776,7 +19753,6 @@ def test_delete_objects_if_match_size():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_objects_current_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
@@ -19803,7 +19779,6 @@ def test_delete_objects_current_if_match_size():
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_implemented
 def test_delete_objects_version_if_match_size():
     client = get_client()
     bucket = get_new_bucket(client)
