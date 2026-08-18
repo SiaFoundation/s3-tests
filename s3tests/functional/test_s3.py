@@ -19855,7 +19855,6 @@ def test_copy_object_if_match_dest():
     response = client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch='*')
     assert 200 == response['ResponseMetadata']['HTTPStatusCode']
 
-@pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.copy
@@ -19879,7 +19878,6 @@ def test_copy_object_current_if_none_match_dest():
     response = client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch='*')
     assert 200 == response['ResponseMetadata']['HTTPStatusCode']
 
-@pytest.mark.fails_on_aws # only supported for directory buckets
 @pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.copy
@@ -20017,7 +20015,6 @@ def test_copy_object_source_version_if_match():
     client.copy_object(Bucket=bucket, Key=dst, CopySource=old_source, CopySourceIfMatch=first['ETag'])
     assert 'first' == _get_body(client.get_object(Bucket=bucket, Key=dst))
 
-@pytest.mark.conditional_write
 @pytest.mark.fails_on_dbstore
 @pytest.mark.copy
 def test_copy_object_source_delete_marker_version():
@@ -20051,7 +20048,8 @@ def test_multipart_copy_source_range_if_match():
     dst_key = 'dst'
     copy_source = src_bucket + '/' + src_key
 
-    body = 'abcdefghij'
+    # a range copy is only allowed when the source is larger than 5MB
+    body = 'abcdefghij' + 'x' * (6*1024*1024)
     etag = client.put_object(Bucket=src_bucket, Key=src_key, Body=body)['ETag']
 
     upload_id = client.create_multipart_upload(Bucket=dst_bucket, Key=dst_key)['UploadId']
