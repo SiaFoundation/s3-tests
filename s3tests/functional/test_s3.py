@@ -19799,6 +19799,299 @@ def test_delete_objects_version_if_match_size():
     response = client.delete_objects(Bucket=bucket, Delete={'Objects': [{'Key': key, 'VersionId': version, 'Size': badsize}]})
     assert 200 == response['ResponseMetadata']['HTTPStatusCode']
 
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_if_none_match_dest():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    src = 'src'
+    dst = 'dst'
+    copy_source = bucket + '/' + src
+
+    client.put_object(Bucket=bucket, Key=src, Body='source')
+
+    # the destination does not exist yet, so the wildcard is satisfied
+    client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch='*')
+    etag = client.head_object(Bucket=bucket, Key=dst)['ETag']
+
+    # the destination exists now, so the wildcard and the current etag both fail
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch='*')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch=etag)
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    # an etag that does not match the destination is satisfied
+    response = client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch='badetag')
+    assert 200 == response['ResponseMetadata']['HTTPStatusCode']
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_if_match_dest():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    src = 'src'
+    dst = 'dst'
+    copy_source = bucket + '/' + src
+
+    client.put_object(Bucket=bucket, Key=src, Body='source')
+
+    # If-Match cannot be satisfied while the destination is absent
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch='*')
+    assert (404, 'NoSuchKey') == _get_status_and_error_code(e.response)
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch='badetag')
+    assert (404, 'NoSuchKey') == _get_status_and_error_code(e.response)
+
+    client.put_object(Bucket=bucket, Key=dst, Body='destination')
+    etag = client.head_object(Bucket=bucket, Key=dst)['ETag']
+
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch='badetag')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    response = client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch=etag)
+    assert 200 == response['ResponseMetadata']['HTTPStatusCode']
+
+    response = client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch='*')
+    assert 200 == response['ResponseMetadata']['HTTPStatusCode']
+
+@pytest.mark.fails_on_aws # only supported for directory buckets
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_current_if_none_match_dest():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    check_configure_versioning_retry(bucket, "Enabled", "Enabled")
+    src = 'src'
+    dst = 'dst'
+    copy_source = bucket + '/' + src
+
+    client.put_object(Bucket=bucket, Key=src, Body='source')
+    client.put_object(Bucket=bucket, Key=dst, Body='destination')
+
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch='*')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    # a delete marker becomes the current version, so the destination reads as absent
+    client.delete_object(Bucket=bucket, Key=dst)
+
+    response = client.copy_object(Bucket=bucket, Key=dst, CopySource=copy_source, IfNoneMatch='*')
+    assert 200 == response['ResponseMetadata']['HTTPStatusCode']
+
+@pytest.mark.fails_on_aws # only supported for directory buckets
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_current_if_match_dest_delete_marker():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    check_configure_versioning_retry(bucket, "Enabled", "Enabled")
+    src = 'src'
+    dst = 'dst'
+    copy_source = bucket + '/' + src
+
+    client.put_object(Bucket=bucket, Key=src, Body='source')
+    etag = client.put_object(Bucket=bucket, Key=dst, Body='destination')['ETag']
+
+    # the etag of a version hidden behind a delete marker must not satisfy If-Match
+    client.delete_object(Bucket=bucket, Key=dst)
+
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch=etag)
+    assert (404, 'NoSuchKey') == _get_status_and_error_code(e.response)
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=copy_source, IfMatch='*')
+    assert (404, 'NoSuchKey') == _get_status_and_error_code(e.response)
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.multipart
+@pytest.mark.copy
+def test_multipart_copy_source_if_match():
+    client = get_client()
+    src_bucket = get_new_bucket(client)
+    dst_bucket = get_new_bucket(client)
+    src_key = 'src'
+    dst_key = 'dst'
+    copy_source = src_bucket + '/' + src_key
+
+    body = 'source data'
+    etag = client.put_object(Bucket=src_bucket, Key=src_key, Body=body)['ETag']
+
+    upload_id = client.create_multipart_upload(Bucket=dst_bucket, Key=dst_key)['UploadId']
+
+    e = assert_raises(ClientError, client.upload_part_copy, Bucket=dst_bucket, Key=dst_key,
+        PartNumber=1, UploadId=upload_id, CopySource=copy_source, CopySourceIfMatch='badetag')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    e = assert_raises(ClientError, client.upload_part_copy, Bucket=dst_bucket, Key=dst_key,
+        PartNumber=1, UploadId=upload_id, CopySource=copy_source, CopySourceIfNoneMatch=etag)
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    response = client.upload_part_copy(Bucket=dst_bucket, Key=dst_key, PartNumber=1,
+        UploadId=upload_id, CopySource=copy_source, CopySourceIfMatch=etag)
+    parts = [{'ETag': response['CopyPartResult']['ETag'].strip('"'), 'PartNumber': 1}]
+
+    client.complete_multipart_upload(Bucket=dst_bucket, Key=dst_key, UploadId=upload_id,
+        MultipartUpload={'Parts': parts})
+    assert body == _get_body(client.get_object(Bucket=dst_bucket, Key=dst_key))
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.multipart
+@pytest.mark.copy
+def test_multipart_copy_source_if_modified_since():
+    client = get_client()
+    src_bucket = get_new_bucket(client)
+    dst_bucket = get_new_bucket(client)
+    src_key = 'src'
+    dst_key = 'dst'
+    copy_source = src_bucket + '/' + src_key
+
+    body = 'source data'
+    client.put_object(Bucket=src_bucket, Key=src_key, Body=body)
+    last_modified = client.head_object(Bucket=src_bucket, Key=src_key)['LastModified']
+
+    past = last_modified - datetime.timedelta(minutes=5)
+    future = last_modified + datetime.timedelta(minutes=5)
+
+    upload_id = client.create_multipart_upload(Bucket=dst_bucket, Key=dst_key)['UploadId']
+
+    # the source was modified after 'past', so If-Unmodified-Since is not satisfied
+    e = assert_raises(ClientError, client.upload_part_copy, Bucket=dst_bucket, Key=dst_key,
+        PartNumber=1, UploadId=upload_id, CopySource=copy_source, CopySourceIfUnmodifiedSince=past)
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    # the source was not modified after 'future', so If-Modified-Since is not satisfied.
+    # a copy source reports this as 412 rather than the 304 a read would return
+    e = assert_raises(ClientError, client.upload_part_copy, Bucket=dst_bucket, Key=dst_key,
+        PartNumber=1, UploadId=upload_id, CopySource=copy_source, CopySourceIfModifiedSince=future)
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    response = client.upload_part_copy(Bucket=dst_bucket, Key=dst_key, PartNumber=1,
+        UploadId=upload_id, CopySource=copy_source, CopySourceIfUnmodifiedSince=future)
+    parts = [{'ETag': response['CopyPartResult']['ETag'].strip('"'), 'PartNumber': 1}]
+
+    client.complete_multipart_upload(Bucket=dst_bucket, Key=dst_key, UploadId=upload_id,
+        MultipartUpload={'Parts': parts})
+    assert body == _get_body(client.get_object(Bucket=dst_bucket, Key=dst_key))
+
+@pytest.mark.fails_on_aws # a list of etags is RFC 7232, but S3 only documents a single etag
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+def test_put_object_if_match_etag_list():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    key = 'obj'
+
+    etag = client.put_object(Bucket=bucket, Key=key, Body='data')['ETag']
+
+    # a list holding the current etag is satisfied
+    response = client.put_object(Bucket=bucket, Key=key, Body='data2', IfMatch='"badetag", ' + etag)
+    assert 200 == response['ResponseMetadata']['HTTPStatusCode']
+
+    # a list without it is not
+    e = assert_raises(ClientError, client.put_object, Bucket=bucket, Key=key, Body='data3',
+        IfMatch='"badetag", "otheretag"')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_source_version_if_match():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    check_configure_versioning_retry(bucket, "Enabled", "Enabled")
+    src = 'src'
+    dst = 'dst'
+
+    first = client.put_object(Bucket=bucket, Key=src, Body='first')
+    second = client.put_object(Bucket=bucket, Key=src, Body='second')
+
+    old_source = {'Bucket': bucket, 'Key': src, 'VersionId': first['VersionId']}
+
+    # the precondition is evaluated against the addressed version, not the current one
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst,
+        CopySource=old_source, CopySourceIfMatch=second['ETag'])
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    client.copy_object(Bucket=bucket, Key=dst, CopySource=old_source, CopySourceIfMatch=first['ETag'])
+    assert 'first' == _get_body(client.get_object(Bucket=bucket, Key=dst))
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_source_delete_marker_version():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    check_configure_versioning_retry(bucket, "Enabled", "Enabled")
+    src = 'src'
+    dst = 'dst'
+
+    client.put_object(Bucket=bucket, Key=src, Body='source')
+    marker = client.delete_object(Bucket=bucket, Key=src)
+
+    # the current version is a delete marker, so the source reads as absent
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst, CopySource=bucket + '/' + src)
+    assert (404, 'NoSuchKey') == _get_status_and_error_code(e.response)
+
+    # addressing the delete marker directly is a bad request instead
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=dst,
+        CopySource={'Bucket': bucket, 'Key': src, 'VersionId': marker['VersionId']})
+    assert (400, 'InvalidRequest') == _get_status_and_error_code(e.response)
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.multipart
+@pytest.mark.copy
+def test_multipart_copy_source_range_if_match():
+    client = get_client()
+    src_bucket = get_new_bucket(client)
+    dst_bucket = get_new_bucket(client)
+    src_key = 'src'
+    dst_key = 'dst'
+    copy_source = src_bucket + '/' + src_key
+
+    body = 'abcdefghij'
+    etag = client.put_object(Bucket=src_bucket, Key=src_key, Body=body)['ETag']
+
+    upload_id = client.create_multipart_upload(Bucket=dst_bucket, Key=dst_key)['UploadId']
+
+    # a failed precondition must be reported before the range is applied
+    e = assert_raises(ClientError, client.upload_part_copy, Bucket=dst_bucket, Key=dst_key,
+        PartNumber=1, UploadId=upload_id, CopySource=copy_source,
+        CopySourceRange='bytes=2-5', CopySourceIfMatch='badetag')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    response = client.upload_part_copy(Bucket=dst_bucket, Key=dst_key, PartNumber=1,
+        UploadId=upload_id, CopySource=copy_source,
+        CopySourceRange='bytes=2-5', CopySourceIfMatch=etag)
+    parts = [{'ETag': response['CopyPartResult']['ETag'].strip('"'), 'PartNumber': 1}]
+
+    client.complete_multipart_upload(Bucket=dst_bucket, Key=dst_key, UploadId=upload_id,
+        MultipartUpload={'Parts': parts})
+    assert 'cdef' == _get_body(client.get_object(Bucket=dst_bucket, Key=dst_key))
+
+@pytest.mark.conditional_write
+@pytest.mark.fails_on_dbstore
+@pytest.mark.copy
+def test_copy_object_replace_self_if_match():
+    client = get_client()
+    bucket = get_new_bucket(client)
+    key = 'obj'
+    copy_source = bucket + '/' + key
+
+    etag = client.put_object(Bucket=bucket, Key=key, Body='data')['ETag']
+
+    # a self copy carries both the source and the destination preconditions
+    e = assert_raises(ClientError, client.copy_object, Bucket=bucket, Key=key, CopySource=copy_source,
+        MetadataDirective='REPLACE', IfMatch='badetag')
+    assert (412, 'PreconditionFailed') == _get_status_and_error_code(e.response)
+
+    response = client.copy_object(Bucket=bucket, Key=key, CopySource=copy_source,
+        MetadataDirective='REPLACE', IfMatch=etag)
+    assert 200 == response['ResponseMetadata']['HTTPStatusCode']
+    assert 'data' == _get_body(client.get_object(Bucket=bucket, Key=key))
+
 def public_bucket_policy(bucket):
     return json.dumps({
         "Version": "2012-10-17",
