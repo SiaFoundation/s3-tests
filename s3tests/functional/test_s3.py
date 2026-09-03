@@ -11673,6 +11673,7 @@ def test_sse_kms_read_declare():
     assert status == 400
 
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_implemented
 def test_bucket_policy():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11886,6 +11887,7 @@ def test_bucketv2_policy_acl():
     client.put_bucket_acl(Bucket=bucket_name, ACL='public-read')
 
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_different_tenant():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11954,6 +11956,7 @@ def test_bucket_policy_multipart():
     alt_client.create_multipart_upload(Bucket=bucket_name, Key=key)
 
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_tenanted_bucket():
     tenant_client = get_tenant_client()
     bucket_name = get_new_bucket(tenant_client)
@@ -11988,6 +11991,7 @@ def test_bucket_policy_tenanted_bucket():
     assert len(response['Contents']) == 1
 
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_implemented
 def test_bucket_policy_another_bucket():
     bucket_name = get_new_bucket()
     bucket_name2 = get_new_bucket()
@@ -12066,6 +12070,7 @@ def test_bucketv2_policy_another_bucket():
 @pytest.mark.bucket_policy
 # TODO: remove this fails_on_rgw when I fix it
 @pytest.mark.fails_on_rgw
+@pytest.mark.s3d_not_implemented
 def test_bucket_policy_set_condition_operator_end_with_IfExists():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13014,6 +13019,7 @@ def test_bucket_policy_put_obj_acl():
 
 
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_put_obj_grant():
 
     bucket_name = get_new_bucket()
