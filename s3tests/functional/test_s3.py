@@ -10837,29 +10837,34 @@ def test_list_object_versions_restore_status():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encrypted_transfer_1b():
     _test_encryption_sse_customer_write(1)
 
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encrypted_transfer_1kb():
     _test_encryption_sse_customer_write(1024)
 
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encrypted_transfer_1MB():
     _test_encryption_sse_customer_write(1024*1024)
 
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encrypted_transfer_13b():
     _test_encryption_sse_customer_write(13)
 
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_method_head():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -10885,6 +10890,7 @@ def test_encryption_sse_c_method_head():
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_present():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -10905,6 +10911,7 @@ def test_encryption_sse_c_present():
     assert status == 400
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_other_key():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -10932,6 +10939,7 @@ def test_encryption_sse_c_other_key():
     assert status == 400
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_invalid_md5():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -10950,6 +10958,7 @@ def test_encryption_sse_c_invalid_md5():
     assert status == 400
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_no_md5():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -10965,6 +10974,7 @@ def test_encryption_sse_c_no_md5():
     e = assert_raises(ClientError, client.put_object, Bucket=bucket_name, Key=key, Body=data)
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_no_key():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -10979,6 +10989,7 @@ def test_encryption_sse_c_no_key():
     e = assert_raises(ClientError, client.put_object, Bucket=bucket_name, Key=key, Body=data)
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_encryption_key_no_sse_c():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11250,6 +11261,7 @@ def test_encryption_sse_c_multipart_bad_download():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_post_object_authenticated_request():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11305,6 +11317,7 @@ def test_encryption_sse_c_post_object_authenticated_request():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_enforced_with_bucket_policy():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11335,6 +11348,7 @@ def test_encryption_sse_c_enforced_with_bucket_policy():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_encryption_sse_c_deny_algo_with_bucket_policy():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11390,6 +11404,7 @@ def _test_sse_kms_customer_write(file_size, key_id = 'testkey-1'):
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_method_head():
     kms_keyid = get_main_kms_keyid()
     bucket_name = get_new_bucket()
@@ -11417,6 +11432,7 @@ def test_sse_kms_method_head():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_present():
     kms_keyid = get_main_kms_keyid()
     bucket_name = get_new_bucket()
@@ -11437,6 +11453,7 @@ def test_sse_kms_present():
     assert body == data
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_sse_kms_no_key():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11453,6 +11470,7 @@ def test_sse_kms_no_key():
 
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_sse_kms_not_declared():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -11519,6 +11537,7 @@ def test_sse_kms_multipart_upload():
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
+@pytest.mark.s3d_not_supported
 def test_sse_kms_multipart_invalid_chunks_1():
     kms_keyid = get_main_kms_keyid()
     kms_keyid2 = get_secondary_kms_keyid()
@@ -11547,6 +11566,7 @@ def test_sse_kms_multipart_invalid_chunks_1():
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
+@pytest.mark.s3d_not_supported
 def test_sse_kms_multipart_invalid_chunks_2():
     kms_keyid = get_main_kms_keyid()
     bucket_name = get_new_bucket()
@@ -11573,6 +11593,7 @@ def test_sse_kms_multipart_invalid_chunks_2():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_post_object_authenticated_request():
     kms_keyid = get_main_kms_keyid()
     bucket_name = get_new_bucket()
@@ -11619,6 +11640,7 @@ def test_sse_kms_post_object_authenticated_request():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_transfer_1b():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -11628,6 +11650,7 @@ def test_sse_kms_transfer_1b():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_transfer_1kb():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -11637,6 +11660,7 @@ def test_sse_kms_transfer_1kb():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_transfer_1MB():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -11646,6 +11670,7 @@ def test_sse_kms_transfer_1MB():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_transfer_13b():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -11654,6 +11679,7 @@ def test_sse_kms_transfer_13b():
 
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_sse_kms_read_declare():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13105,6 +13131,7 @@ def test_put_obj_enc_conflict_c_s3():
     assert error_code == 'InvalidArgument'
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_put_obj_enc_conflict_c_kms():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -13132,6 +13159,7 @@ def test_put_obj_enc_conflict_c_kms():
     assert error_code == 'InvalidArgument'
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_put_obj_enc_conflict_s3_kms():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -13156,6 +13184,7 @@ def test_put_obj_enc_conflict_s3_kms():
     assert error_code == 'InvalidArgument'
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_put_obj_enc_conflict_bad_enc_kms():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -13182,6 +13211,7 @@ def test_put_obj_enc_conflict_bad_enc_kms():
 @pytest.mark.bucket_policy
 @pytest.mark.sse_s3
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_implemented
 def test_bucket_policy_put_obj_s3_noenc():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13211,6 +13241,7 @@ def test_bucket_policy_put_obj_s3_noenc():
 @pytest.mark.bucket_policy
 @pytest.mark.sse_s3
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_implemented
 def test_bucket_policy_put_obj_s3_incorrect_algo_sse_s3():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -13239,6 +13270,7 @@ def test_bucket_policy_put_obj_s3_incorrect_algo_sse_s3():
 @pytest.mark.encryption
 @pytest.mark.bucket_policy
 @pytest.mark.sse_s3
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_put_obj_s3_kms():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -13285,6 +13317,7 @@ def test_bucket_policy_put_obj_s3_kms():
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_put_obj_kms_noenc():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -13331,6 +13364,7 @@ def test_bucket_policy_put_obj_kms_noenc():
 
 @pytest.mark.encryption
 @pytest.mark.bucket_policy
+@pytest.mark.s3d_not_supported
 def test_bucket_policy_put_obj_kms_s3():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14747,6 +14781,7 @@ def test_put_bucket_encryption_s3():
     _put_bucket_encryption_s3(client, bucket_name)
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_put_bucket_encryption_kms():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14774,6 +14809,7 @@ def test_get_bucket_encryption_s3():
 
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_get_bucket_encryption_kms():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -14820,6 +14856,7 @@ def test_delete_bucket_encryption_s3():
 
 
 @pytest.mark.encryption
+@pytest.mark.s3d_not_supported
 def test_delete_bucket_encryption_kms():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -14915,6 +14952,7 @@ def _test_sse_kms_default_upload(file_size):
 @pytest.mark.bucket_encryption
 @pytest.mark.sse_s3
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_default_upload_1b():
     _test_sse_kms_default_upload(1)
 
@@ -14922,6 +14960,7 @@ def test_sse_kms_default_upload_1b():
 @pytest.mark.bucket_encryption
 @pytest.mark.sse_s3
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_default_upload_1kb():
     _test_sse_kms_default_upload(1024)
 
@@ -14929,6 +14968,7 @@ def test_sse_kms_default_upload_1kb():
 @pytest.mark.bucket_encryption
 @pytest.mark.sse_s3
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_default_upload_1mb():
     _test_sse_kms_default_upload(1024*1024)
 
@@ -14936,6 +14976,7 @@ def test_sse_kms_default_upload_1mb():
 @pytest.mark.bucket_encryption
 @pytest.mark.sse_s3
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_default_upload_8mb():
     _test_sse_kms_default_upload(8*1024*1024)
 
@@ -15063,6 +15104,7 @@ def test_sse_s3_default_post_object_authenticated_request():
 @pytest.mark.encryption
 @pytest.mark.bucket_encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_sse_kms_default_post_object_authenticated_request():
     kms_keyid = get_main_kms_keyid()
     if kms_keyid is None:
@@ -19529,6 +19571,7 @@ def test_get_versioned_object_attributes():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 def test_get_sse_c_encrypted_object_attributes():
     bucket_name = get_new_bucket()
     client = get_client()
@@ -21257,6 +21300,7 @@ def generate_copy_part_enc_params():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 @pytest.mark.parametrize(
     "source_mode_key, dest_mode_key, source_storage_class, dest_storage_class, obj_size",
     generate_copy_part_enc_params()
@@ -21302,6 +21346,7 @@ def generate_copy_enc_params():
 
 @pytest.mark.encryption
 @pytest.mark.fails_on_dbstore
+@pytest.mark.s3d_not_supported
 @pytest.mark.parametrize(
     "source_mode_key, dest_mode_key, source_storage_class, dest_storage_class, obj_size",
     generate_copy_enc_params()
