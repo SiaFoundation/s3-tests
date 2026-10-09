@@ -13873,7 +13873,6 @@ def test_object_lock_put_obj_retention_shorten_period_bypass():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_retention():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13893,7 +13892,6 @@ def test_object_lock_delete_object_with_retention():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
-@pytest.mark.s3d_not_supported
 def test_object_lock_delete_multipart_object_with_retention():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13920,7 +13918,6 @@ def test_object_lock_delete_multipart_object_with_retention():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_retention_and_marker():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -13947,7 +13944,6 @@ def test_object_lock_delete_object_with_retention_and_marker():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_object_lock_multi_delete_object_with_retention():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -14086,7 +14082,6 @@ def test_object_lock_get_legal_hold_invalid_bucket():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_legal_hold_on():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -14102,7 +14097,6 @@ def test_object_lock_delete_object_with_legal_hold_on():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.multipart
-@pytest.mark.s3d_not_supported
 def test_object_lock_delete_multipart_object_with_legal_hold_on():
     bucket_name = get_new_bucket_name()
     client = get_client()
@@ -14126,7 +14120,6 @@ def test_object_lock_delete_multipart_object_with_legal_hold_on():
 
 @pytest.mark.fails_on_dbstore
 @pytest.mark.delete
-@pytest.mark.s3d_not_supported
 def test_object_lock_delete_object_with_legal_hold_off():
     bucket_name = get_new_bucket_name()
     client = get_client()
